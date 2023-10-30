@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">BirdSpotterAppPoe</string>
+    <string-array name="sort_types">
+        <item>SORT BY DATE</item>
+        <item>SORT BY NAME</item>
+        <item>SORT BY RARITY</item>
+        <item>SORT BY NOTES</item>
+        <item>SORT BY DATE</item>
+    </string-array>
+    <string name="title_activity_mark_bird_location">MarkBirdLocation</string>
+    <string name="title_activity_maps">MapsActivity</string>
+    <string name="maximum_distance_label" />
+
+
+</resources>
