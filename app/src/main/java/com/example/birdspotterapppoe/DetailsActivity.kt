@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -17,11 +18,21 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.drawToBitmap
+import coil.Coil
+import coil.load
+import coil.request.ImageRequest
+import com.example.birdspotterapppoe.Constants.TAG
+import com.google.firebase.firestore.FieldValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class DetailsActivity : AppCompatActivity() {
 
     private val dbHandler = DatabaseHelper(this, null)
+    private lateinit var firestoreClass:FirestoreClass
 
     private lateinit var nameEditText: EditText
     private lateinit var notesEditText: EditText
@@ -30,8 +41,10 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var uploadImageView: ImageView
     private lateinit var raritySpinner: Spinner
     private lateinit var modifyId: String
+    private lateinit var  imageUrl:String
     private var latLng: String = ""
     private var address: String = ""
+     var selectedImage: Uri ?= null
 
     private var rarityTypes = mapOf(Pair("Common", 0), Pair("Rare", 1), Pair("Extremely rare", 2))
 
@@ -46,6 +59,9 @@ class DetailsActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
+        // initialize firestore
+        firestoreClass = FirestoreClass()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
 
@@ -83,7 +99,19 @@ class DetailsActivity : AppCompatActivity() {
             raritySpinner.setSelection(rarityTypes[rarity]!!)
             latLng = intent.getStringExtra("latLng") ?: ""
             address = intent.getStringExtra("address") ?: ""
-            uploadImageView.setImageBitmap(Utils.getBitmapFromMemCache(modifyId))
+            /**
+             * getting image
+             */
+            imageUrl = intent.getStringExtra("image") ?: ""
+            Log.e(TAG,"image url  in update if (intent.hasExtra(\"id\")) {  imageUrl $imageUrl")
+            val imageView = uploadImageView
+            val context = imageView.context
+            val imageLoader = Coil.imageLoader(context)
+            val request = ImageRequest.Builder(context)
+                .data(imageUrl)
+                .target(imageView)
+                .build()
+            imageLoader.enqueue(request)
             findViewById<Button>(R.id.btnAdd).visibility = View.GONE
         } else {
             findViewById<Button>(R.id.btnUpdate).visibility = View.GONE
@@ -94,11 +122,12 @@ class DetailsActivity : AppCompatActivity() {
         getContent = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 val data: Intent? = result.data
+
                 if (data != null) {
-                    val selectedImage: Uri? = data.data
+                     selectedImage = data.data!!
                     if (selectedImage != null) {
                         try {
-                            val inputStream = contentResolver.openInputStream(selectedImage)
+                            val inputStream = contentResolver.openInputStream(selectedImage!!)
                             if (inputStream != null) {
                                 val bitMap = BitmapFactory.decodeStream(inputStream)
                                 uploadImageView.setImageBitmap(bitMap)
@@ -159,17 +188,15 @@ class DetailsActivity : AppCompatActivity() {
 
         if (requestCode == 1 && resultCode == RESULT_OK) {
             if (data != null) {
-                val selectedImage: Uri? = data.data
+                selectedImage = data.data!!
 
                 if (selectedImage != null) {
                     try {
-                        val inputStream = contentResolver.openInputStream(selectedImage)
+                        val inputStream = contentResolver.openInputStream(selectedImage!!)
                         if (inputStream != null) {
                             val bitMap = BitmapFactory.decodeStream(inputStream)
                             inputStream.close()
-
                             uploadImageView.setImageBitmap(bitMap)
-
                             val id = intent.getStringExtra("id") ?: ""
                             Utils.addBitmapToMemoryCache(id, bitMap)
                         }
@@ -186,23 +213,31 @@ class DetailsActivity : AppCompatActivity() {
         }
     }
 
-
-
     fun add(v: View) {
         val name = nameEditText.text.toString()
         val notes = notesEditText.text.toString()
         val rarity = rarityTypes[raritySpinner.selectedItem]
-        val image = uploadImageView
 
-        dbHandler.insertRow(
-            name,
-            rarity.toString(),
-            notes,
-            Utils.getBytes(image.drawToBitmap()),
-            latLng, address
-        )
 
-        Toast.makeText(this, "Data added", Toast.LENGTH_SHORT).show()
+        CoroutineScope(Dispatchers.IO).launch {
+            val imageUri = firestoreClass.savePictureInStorage(selectedImage!!)
+            Log.e(TAG, " firestore Class.savePictureInStorage $imageUri")
+            val bird = Bird(
+                name = name,
+                rarity = rarity.toString(),
+                notes = notes,
+                image = imageUri,
+                latLng = latLng,
+                address = address
+            )
+
+            firestoreClass.addBird(bird)
+            withContext(Dispatchers.Main) {
+                Log.e(TAG, "The bird added is $bird")
+                Toast.makeText(this@DetailsActivity, "Bird added successfully", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         finish()
     }
 
@@ -210,23 +245,35 @@ class DetailsActivity : AppCompatActivity() {
         val name = nameEditText.text.toString()
         val notes = notesEditText.text.toString()
         val rarity = rarityTypes[raritySpinner.selectedItem]
-        val image = uploadImageView
 
-        dbHandler.updateRow(
-            modifyId,
-            name,
-            rarity.toString(),
-            notes,
-            Utils.getBytes(image.drawToBitmap()),
-            latLng, address
-        )
 
-        Toast.makeText(this, "Data updated", Toast.LENGTH_SHORT).show()
-        finish()
+        CoroutineScope(Dispatchers.IO).launch {
+            var imageUri = imageUrl
+            if (selectedImage != null) {
+                imageUri = firestoreClass.savePictureInStorage(selectedImage!!)
+                Log.e(TAG, "firestore Class.savePictureInStorage $imageUri")
+            }
+
+            val bird = Bird(
+                name = name,
+                rarity = rarity.toString(),
+                notes = notes,
+                image = imageUri,
+                latLng = latLng,
+                address = address
+            )
+
+            firestoreClass.updateBird(modifyId,bird)
+            withContext(Dispatchers.Main) {
+                Log.e(TAG, "The bird added is $bird")
+                Toast.makeText(this@DetailsActivity, "Bird updated successfully", Toast.LENGTH_SHORT).show()
+            }
+            finish()
+        }
     }
 
     fun delete(v: View) {
-        dbHandler.deleteRow(modifyId)
+        firestoreClass.deleteBird(modifyId)
         Toast.makeText(this, "Data deleted", Toast.LENGTH_SHORT).show()
         finish()
     }

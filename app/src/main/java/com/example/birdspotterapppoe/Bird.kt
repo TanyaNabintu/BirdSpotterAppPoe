@@ -1,30 +1,16 @@
 package com.example.birdspotterapppoe
 
-class Bird(
-    id: String,
-    name: String,
-    rarity: Int,
-    notes: String,
-    image: ByteArray?,
-    latLng: String?,
-    address: String?,
-    date: String
-) {
+import com.google.firebase.firestore.ServerTimestamp
+import java.util.Date
 
-    var id: String = id
-        private set
-    var name: String = name
-        private set
-    var rarity: Int = rarity
-        private set
-    var notes: String = notes
-        private set
-    var image: ByteArray? = image
-        private set
-    var latLng: String? = latLng
-        private set
-    var address: String? = address
-        private set
-    var date: String = date
-        private set
-}
+data class Bird(
+    var id: String? = "",
+    var name: String? = "",
+    val rarity: String = "", // default value
+    var notes: String? = "",
+    var image: String? = "",
+    var latLng: String?  = "",
+    var address: String? = "Default Address", // default value
+    @ServerTimestamp
+    var date: Date? = Date()
+)

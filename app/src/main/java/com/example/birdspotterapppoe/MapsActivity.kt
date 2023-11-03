@@ -27,6 +27,7 @@ import android.net.Uri
 import android.view.MenuItem
 
 
+
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
@@ -249,3 +250,5 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 }
+
+

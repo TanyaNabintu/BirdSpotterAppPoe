@@ -7,13 +7,17 @@ import android.database.Cursor
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import java.util.*
-import android.widget.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity2 : AppCompatActivity() {
     private val dbHandler = DatabaseHelper(this, null)
     private var birdList = ArrayList<Bird>()
+
+    private lateinit var firestoreClass:FirestoreClass
 
     private lateinit var spinner: Spinner
     private lateinit var textView: TextView
@@ -27,6 +31,9 @@ class MainActivity2 : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main2)
+
+        // initialize firestore
+        firestoreClass = FirestoreClass()
 
         textView = findViewById(R.id.textView)
         spinner = findViewById(R.id.sortSpinner)
@@ -78,54 +85,47 @@ class MainActivity2 : AppCompatActivity() {
         }
     }
 
-
-
     fun loadIntoList(orderBy: String) {
-        birdList.clear()
-        val cursor: Cursor? = dbHandler.getAllRow(orderBy)
-        cursor!!.moveToFirst()
+        firestoreClass.getBirdList { birdList ->
 
-        while (!cursor.isAfterLast) {
+            val sortedList = when (orderBy) {
+                "name" -> birdList.sortedBy { it.name }
+                "rarity" -> birdList.sortedByDescending { it.rarity }
+                "notes" -> birdList.sortedBy { it.notes }
+                "date" -> birdList.sortedByDescending { it.date }
+                else -> birdList
+            }
 
-            val id = cursor.getString(0)
-            val name = cursor.getString(1)
-            val rarity = cursor.getInt(2)
-            val notes = cursor.getString(3)
-            val image = cursor.getBlob(4)
-            val latLng = cursor.getString(5)
-            val address = cursor.getString(6)
-            val date = cursor.getString(7)
+            this.birdList.clear()
+            this.birdList.addAll(birdList)
 
-            birdList.add(Bird(id, name, rarity, notes, image, latLng, address, date))
-            cursor.moveToNext()
-        }
+            customAdapter?.notifyDataSetChanged()
 
-        customAdapter?.notifyDataSetChanged()
+            if (birdList.count() == 0) {
+                textView.text = "Add a bird."
+            } else {
+                textView.visibility = View.GONE
 
-        if (birdList.count() == 0) {
-            textView.text = "Add a bird."
-        } else {
-            textView.visibility = View.GONE
+                customAdapter = CustomAdapter(this@MainActivity2, birdList as ArrayList<Bird>)
+                listView.adapter = customAdapter
 
-            customAdapter = CustomAdapter(this@MainActivity2, birdList)
-            listView.adapter = customAdapter
+                findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
+                    val intent = Intent(this, DetailsActivity::class.java)
 
-            findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
-                val intent = Intent(this, DetailsActivity::class.java)
+                    intent.putExtra("id", birdList[+i].id)
+                    intent.putExtra("name", birdList[+i].name)
+                    intent.putExtra("notes", birdList[+i].notes)
+                    intent.putExtra("image", birdList[+i].image)
+                    intent.putExtra("latLng", birdList[+i].latLng)
+                    intent.putExtra("address", birdList[+i].address)
 
-                intent.putExtra("id", birdList[+i].id)
-                intent.putExtra("name", birdList[+i].name)
-                intent.putExtra("notes", birdList[+i].notes)
-                intent.putExtra("rarity", rarityTypes[birdList[+i].rarity])
-                intent.putExtra("latLng", birdList[+i].latLng)
-                intent.putExtra("address", birdList[+i].address)
 
-                Utils.addBitmapToMemoryCache(birdList[+i].id, Utils.getImage(birdList[+i].image))
-
-                startActivity(intent)
+                    startActivity(intent)
+                }
             }
         }
     }
+
 
     fun fabClicked(v: View) {
         val intent = Intent(this, DetailsActivity::class.java)
