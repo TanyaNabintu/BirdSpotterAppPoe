@@ -71,7 +71,7 @@ class CustomAdapter(
         }
 
         val imageString = dataitem.image // Create a local copy of image
-        Log.e(TAG, "the image loadded url is $imageString")
+        Log.e(TAG, "the image loaded url is $imageString")
 
         if (imageString != null) {
             val imageView = rowView.findViewById<ImageView>(R.id.row_image)

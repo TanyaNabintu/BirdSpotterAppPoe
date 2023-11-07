@@ -68,13 +68,14 @@ class MainActivity2 : AppCompatActivity() {
                     startActivity(intent)
                 } else {
                     // Handle other sorting options
+                    // Handle other sorting options
                     when (selectedItem) {
-                        "SORT BY NAME" -> loadIntoList("ORDER BY LENGTH(name) DESC")
-                        "SORT BY RARITY" -> loadIntoList("ORDER BY rarity DESC")
-                        "SORT BY NOTES" -> loadIntoList("ORDER BY LENGTH(notes) DESC")
-                        "SORT BY DATE" -> loadIntoList("ORDER BY date DESC")
-
+                        "SORT BY NAME" -> loadIntoList("name")
+                        "SORT BY RARITY" -> loadIntoList("rarity")
+                        "SORT BY NOTES" -> loadIntoList("notes")
+                        "SORT BY DATE" -> loadIntoList("date")
                     }
+
                     Toast.makeText(
                         this@MainActivity2,
                         "Selected: $selectedItem",
@@ -97,11 +98,11 @@ class MainActivity2 : AppCompatActivity() {
             }
 
             this.birdList.clear()
-            this.birdList.addAll(birdList)
+            this.birdList.addAll(sortedList)
 
             customAdapter?.notifyDataSetChanged()
 
-            if (birdList.count() == 0) {
+            if (sortedList.isEmpty()) {
                 textView.text = "Add a bird."
             } else {
                 textView.visibility = View.GONE
@@ -112,14 +113,12 @@ class MainActivity2 : AppCompatActivity() {
                 findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
                     val intent = Intent(this, DetailsActivity::class.java)
 
-                    intent.putExtra("id", birdList[+i].id)
-                    intent.putExtra("name", birdList[+i].name)
-                    intent.putExtra("notes", birdList[+i].notes)
-                    intent.putExtra("image", birdList[+i].image)
-                    intent.putExtra("latLng", birdList[+i].latLng)
-                    intent.putExtra("address", birdList[+i].address)
-
-
+                    intent.putExtra("id", sortedList[+i].id) // Use sortedList here
+                    intent.putExtra("name", sortedList[+i].name) // Use sortedList here
+                    intent.putExtra("notes", sortedList[+i].notes) // Use sortedList here
+                    intent.putExtra("image", sortedList[+i].image) // Use sortedList here
+                    intent.putExtra("latLng", sortedList[+i].latLng) // Use sortedList here
+                    intent.putExtra("address", sortedList[+i].address) // Use sortedList here
                     startActivity(intent)
                 }
             }
