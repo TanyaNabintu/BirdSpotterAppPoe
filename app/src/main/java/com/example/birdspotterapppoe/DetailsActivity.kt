@@ -237,6 +237,8 @@ class DetailsActivity : AppCompatActivity() {
                 Toast.makeText(this@DetailsActivity, "Bird added successfully", Toast.LENGTH_SHORT).show()
             }
         }
+        val intent = Intent(this@DetailsActivity, MainActivity2::class.java)
+        startActivity(intent)
 
         finish()
     }
@@ -254,20 +256,22 @@ class DetailsActivity : AppCompatActivity() {
                 Log.e(TAG, "firestore Class.savePictureInStorage $imageUri")
             }
 
-            val bird = Bird(
-                name = name,
-                rarity = rarity.toString(),
-                notes = notes,
-                image = imageUri,
-                latLng = latLng,
-                address = address
+            val birdUpdates = mapOf(
+                "name" to name,
+                "rarity" to rarity.toString(),
+                "notes" to notes,
+                "image" to imageUri,
+                "latLng" to latLng,
+                "address" to address
             )
 
-            firestoreClass.updateBird(modifyId,bird)
+            firestoreClass.updateBird(modifyId,birdUpdates)
             withContext(Dispatchers.Main) {
-                Log.e(TAG, "The bird added is $bird")
+                Log.e(TAG, "The bird added is $birdUpdates")
                 Toast.makeText(this@DetailsActivity, "Bird updated successfully", Toast.LENGTH_SHORT).show()
             }
+            val intent = Intent(this@DetailsActivity, MainActivity2::class.java)
+            startActivity(intent)
             finish()
         }
     }

@@ -20,7 +20,7 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var unitSwitch: SwitchCompat
     private lateinit var listView: ListView
     private var customAdapter: CustomAdapter? = null
-    private var lastSelectedSortOption: String = "date"
+//    private var lastSelectedSortOption: String = "date"
     private var rarityTypes = mapOf(Pair(0, "Common"), Pair(1, "Rare"), Pair(2, "Extremely rare"))
 
 
@@ -54,13 +54,11 @@ class MainActivity2 : AppCompatActivity() {
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
-            
             override fun onItemSelected(
                 parent: AdapterView<*>?,
                 view: View?,
                 position: Int,
                 id: Long
-
             ) {
                 val selectedItem = sortNames[position]
                 if (selectedItem == "HOTSPOTS") {
@@ -69,14 +67,12 @@ class MainActivity2 : AppCompatActivity() {
                     startActivity(intent)
                 } else {
                     // Handle other sorting options
-                    // Handle other sorting options
                     when (selectedItem) {
                         "SORT BY NAME" -> loadIntoList("name")
                         "SORT BY RARITY" -> loadIntoList("rarity")
                         "SORT BY NOTES" -> loadIntoList("notes")
                         "SORT BY DATE" -> loadIntoList("date")
                     }
-                    loadIntoList(lastSelectedSortOption)
 
                     Toast.makeText(
                         this@MainActivity2,
@@ -88,63 +84,43 @@ class MainActivity2 : AppCompatActivity() {
         }
     }
 
-    fun loadIntoList(orderBy: String) {
-        firestoreClass.getBirdList { birdList ->
+        fun loadIntoList(orderBy: String) {
+            firestoreClass.getBirdList(orderBy) { birdList ->
+                this.birdList.clear()
+                this.birdList.addAll(birdList)
 
-            val sortedList = when (orderBy) {
-                "name" -> birdList.sortedBy { it.name }
-                "rarity" -> birdList.sortedByDescending { it.rarity }
-                "notes" -> birdList.sortedBy { it.notes }
-                "date" -> birdList.sortedByDescending { it.date }
-                else -> birdList
-            }
+                customAdapter?.notifyDataSetChanged()
 
-            this.birdList.clear()
-            this.birdList.addAll(sortedList)
+                if (birdList.isEmpty()) {
+                    textView.text = "Add a bird."
+                } else {
+                    textView.visibility = View.GONE
 
-            customAdapter?.notifyDataSetChanged()
-
-            if (sortedList.isEmpty()) {
-                textView.text = "Add a bird."
-            } else {
-                textView.visibility = View.GONE
-
-
-//                customAdapter = CustomAdapter(this@MainActivity2, birdList as ArrayList<Bird>)
-//                listView.adapter = customAdapter
-
-                findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
-                    val intent = Intent(this, DetailsActivity::class.java)
-
-                    intent.putExtra("id", sortedList[+i].id)
-                    intent.putExtra("name", sortedList[+i].name)
-                    intent.putExtra("notes", sortedList[+i].notes)
-                    intent.putExtra("image", sortedList[+i].image)
-                    intent.putExtra("latLng", sortedList[+i].latLng)
-                    intent.putExtra("address", sortedList[+i].address)
-                    startActivity(intent)
+                    findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
+                        val intent = Intent(this, DetailsActivity::class.java)
+                        intent.putExtra("id", birdList[+i].id)
+                        intent.putExtra("name", birdList[+i].name)
+                        intent.putExtra("notes", birdList[+i].notes)
+                        intent.putExtra("image", birdList[+i].image)
+                        intent.putExtra("latLng", birdList[+i].latLng)
+                        intent.putExtra("address", birdList[+i].address)
+                        startActivity(intent)
+                    }
                 }
             }
         }
-    }
 
 
-    fun fabClicked(v: View) {
+
+        fun fabClicked(v: View) {
         val intent = Intent(this, DetailsActivity::class.java)
         startActivity(intent)
     }
 
     public override fun onResume() {
         super.onResume()
-        loadIntoList(lastSelectedSortOption)
     }
 
-    override fun onRestart() {
-        super.onRestart()
-
-        // Refresh the list with the last selected sorting option
-        loadIntoList(lastSelectedSortOption)
-    }
 }
 
 

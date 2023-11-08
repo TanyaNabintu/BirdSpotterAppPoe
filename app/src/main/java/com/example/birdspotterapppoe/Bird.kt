@@ -14,3 +14,4 @@ data class Bird(
     @ServerTimestamp
     var date: Date? = Date()
 )
+

@@ -7,6 +7,7 @@ import com.example.birdspotterapppoe.Constants.TAG
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -54,8 +55,9 @@ class FirestoreClass {
             }
     }
 
-    fun getBirdList(callback: (List<Bird>) -> Unit) {
+    fun getBirdList(orderBy: String, callback: (List<Bird>) -> Unit) {
         mFireStore.collection(Constants.FirebaseCollectionBirds)
+            .orderBy(orderBy, Query.Direction.ASCENDING)
             .get()
             .addOnSuccessListener { documents ->
                 var birdList = mutableListOf<Bird>()
@@ -72,6 +74,7 @@ class FirestoreClass {
                 Log.w(TAG, "Error getting documents: ", exception)
             }
     }
+
 
 
     fun getOneBird(birdId: String) {
@@ -91,10 +94,10 @@ class FirestoreClass {
     }
 
 
-    fun updateBird(birdId: String, bird: Bird) {
+    fun updateBird(birdId: String, birdUpdates: Map<String, Any>) {
         mFireStore.collection(Constants.FirebaseCollectionBirds)
             .document(birdId)
-            .set(bird, SetOptions.merge())
+            .set(birdUpdates, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d(TAG, "DocumentSnapshot successfully updated!")
             }
