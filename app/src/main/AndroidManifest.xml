@@ -28,9 +28,9 @@
             <!-- No intent-filter for non-launcher activities -->
         </activity>
 
-<!--        <meta-data-->
-<!--            android:name="com.google.android.geo.API_KEY"-->
-<!--            android:value="${google_maps_key}" />-->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${google_maps_key}" />
 
         <activity
             android:name=".DetailsActivity"
