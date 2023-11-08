@@ -3,13 +3,9 @@ package com.example.birdspotterapppoe
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
-import android.database.Cursor
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -24,6 +20,7 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var unitSwitch: SwitchCompat
     private lateinit var listView: ListView
     private var customAdapter: CustomAdapter? = null
+    private var lastSelectedSortOption: String = "date"
     private var rarityTypes = mapOf(Pair(0, "Common"), Pair(1, "Rare"), Pair(2, "Extremely rare"))
 
 
@@ -41,6 +38,10 @@ class MainActivity2 : AppCompatActivity() {
 
         val sortNames = resources.getStringArray(R.array.sort_types).toMutableList()
         sortNames.add("HOTSPOTS") // Add the new option
+
+        customAdapter = CustomAdapter(this@MainActivity2, birdList)
+        listView.adapter = customAdapter
+
 
         val myAdapter = ArrayAdapter(
             applicationContext,
@@ -75,6 +76,7 @@ class MainActivity2 : AppCompatActivity() {
                         "SORT BY NOTES" -> loadIntoList("notes")
                         "SORT BY DATE" -> loadIntoList("date")
                     }
+                    loadIntoList(lastSelectedSortOption)
 
                     Toast.makeText(
                         this@MainActivity2,
@@ -107,18 +109,19 @@ class MainActivity2 : AppCompatActivity() {
             } else {
                 textView.visibility = View.GONE
 
-                customAdapter = CustomAdapter(this@MainActivity2, birdList as ArrayList<Bird>)
-                listView.adapter = customAdapter
+
+//                customAdapter = CustomAdapter(this@MainActivity2, birdList as ArrayList<Bird>)
+//                listView.adapter = customAdapter
 
                 findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
                     val intent = Intent(this, DetailsActivity::class.java)
 
-                    intent.putExtra("id", sortedList[+i].id) // Use sortedList here
-                    intent.putExtra("name", sortedList[+i].name) // Use sortedList here
-                    intent.putExtra("notes", sortedList[+i].notes) // Use sortedList here
-                    intent.putExtra("image", sortedList[+i].image) // Use sortedList here
-                    intent.putExtra("latLng", sortedList[+i].latLng) // Use sortedList here
-                    intent.putExtra("address", sortedList[+i].address) // Use sortedList here
+                    intent.putExtra("id", sortedList[+i].id)
+                    intent.putExtra("name", sortedList[+i].name)
+                    intent.putExtra("notes", sortedList[+i].notes)
+                    intent.putExtra("image", sortedList[+i].image)
+                    intent.putExtra("latLng", sortedList[+i].latLng)
+                    intent.putExtra("address", sortedList[+i].address)
                     startActivity(intent)
                 }
             }
@@ -133,7 +136,14 @@ class MainActivity2 : AppCompatActivity() {
 
     public override fun onResume() {
         super.onResume()
-        loadIntoList("ORDER BY date DESC")
+        loadIntoList(lastSelectedSortOption)
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+
+        // Refresh the list with the last selected sorting option
+        loadIntoList(lastSelectedSortOption)
     }
 }
 

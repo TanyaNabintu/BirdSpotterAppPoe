@@ -145,6 +145,7 @@ class DetailsActivity : AppCompatActivity() {
         // Set the click listener for the "UPLOAD IMAGE" button
         uploadImageButton.setOnClickListener {
             // Check if you have the required permission
+            Log.e(TAG,"upload image clicked")
             if (checkPermissions()) {
                 openImageGallery()
             } else {
@@ -171,7 +172,6 @@ class DetailsActivity : AppCompatActivity() {
             Manifest.permission.READ_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
     }
-
 
     private fun requestStoragePermission() {
         ActivityCompat.requestPermissions(

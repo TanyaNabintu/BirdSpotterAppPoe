@@ -1,7 +1,6 @@
 package com.example.birdspotterapppoe
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +9,12 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import coil.Coil
-import coil.load
 import coil.request.ImageRequest
 import com.example.birdspotterapppoe.Constants.TAG
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class CustomAdapter(
     private val context: Context,
-    private val birdList: ArrayList<Bird>,
+    private val birdList: List<Bird>,
     private val rarityTypes: Map<Int, String> = mapOf(
         Pair(0, "Common"),
         Pair(1, "Rare"),
@@ -50,12 +46,12 @@ class CustomAdapter(
         rowView.findViewById<TextView>(R.id.row_notes).text = dataitem.notes
 
         // Convert FieldValue to String and format the date
-        val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy", Locale.ENGLISH)
-        val targetFormat = SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH)
-        val date = originalFormat.parse(dataitem.date.toString())
-        val formattedDate = targetFormat.format(date)
+//        val originalFormat = SimpleDateFormat("EEE MMM dd HH:mm:ss 'GMT'Z yyyy", Locale.ENGLISH)
+//        val targetFormat = SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH)
+//        val date = originalFormat.parse(dataitem.date.toString())
+//        val formattedDate = targetFormat.format(date)
 
-        rowView.findViewById<TextView>(R.id.row_date).text = formattedDate
+        rowView.findViewById<TextView>(R.id.row_date).text = dataitem.date.toString()
 
 
 //      rowView.findViewById<TextView>(R.id.row_date).text = dataitem.date.toString()
@@ -83,12 +79,8 @@ class CustomAdapter(
                 .build()
             imageLoader.enqueue(request)
         }
-
-
         rowView.tag = position
         return rowView
     }
-
-
 }
 
