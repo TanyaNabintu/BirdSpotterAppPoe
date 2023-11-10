@@ -22,6 +22,8 @@ import coil.Coil
 import coil.load
 import coil.request.ImageRequest
 import com.example.birdspotterapppoe.Constants.TAG
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,6 +35,7 @@ class DetailsActivity : AppCompatActivity() {
 
     private val dbHandler = DatabaseHelper(this, null)
     private lateinit var firestoreClass:FirestoreClass
+    private lateinit var auth: FirebaseAuth
 
     private lateinit var nameEditText: EditText
     private lateinit var notesEditText: EditText
@@ -44,6 +47,7 @@ class DetailsActivity : AppCompatActivity() {
     private lateinit var  imageUrl:String
     private var latLng: String = ""
     private var address: String = ""
+    private var userId:String=""
      var selectedImage: Uri ?= null
 
     private var rarityTypes = mapOf(Pair("Common", 0), Pair("Rare", 1), Pair("Extremely rare", 2))
@@ -61,7 +65,10 @@ class DetailsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         // initialize firestore
+        FirebaseApp.initializeApp(this)
+        auth = FirebaseAuth.getInstance()
         firestoreClass = FirestoreClass()
+        var currentUser=auth.currentUser?.uid
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details)
 
@@ -99,6 +106,7 @@ class DetailsActivity : AppCompatActivity() {
             raritySpinner.setSelection(rarityTypes[rarity]!!)
             latLng = intent.getStringExtra("latLng") ?: ""
             address = intent.getStringExtra("address") ?: ""
+            userId = intent.getStringExtra("userId")?:""
             /**
              * getting image
              */
@@ -112,7 +120,16 @@ class DetailsActivity : AppCompatActivity() {
                 .target(imageView)
                 .build()
             imageLoader.enqueue(request)
+
             findViewById<Button>(R.id.btnAdd).visibility = View.GONE
+            val currentUser = auth.currentUser?.uid
+            if (currentUser == userId) {
+                findViewById<Button>(R.id.btnUpdate).visibility = View.VISIBLE
+                findViewById<Button>(R.id.btnDelete).visibility = View.VISIBLE
+            } else {
+                findViewById<Button>(R.id.btnUpdate).visibility = View.GONE
+                findViewById<Button>(R.id.btnDelete).visibility = View.GONE
+            }
         } else {
             findViewById<Button>(R.id.btnUpdate).visibility = View.GONE
             findViewById<Button>(R.id.btnDelete).visibility = View.GONE
@@ -217,6 +234,7 @@ class DetailsActivity : AppCompatActivity() {
         val name = nameEditText.text.toString()
         val notes = notesEditText.text.toString()
         val rarity = rarityTypes[raritySpinner.selectedItem]
+        val userId = auth.currentUser?.uid
 
 
         CoroutineScope(Dispatchers.IO).launch {
@@ -228,25 +246,29 @@ class DetailsActivity : AppCompatActivity() {
                 notes = notes,
                 image = imageUri,
                 latLng = latLng,
-                address = address
+                address = address,
+                userId = userId.toString()
             )
 
             firestoreClass.addBird(bird)
             withContext(Dispatchers.Main) {
                 Log.e(TAG, "The bird added is $bird")
-                Toast.makeText(this@DetailsActivity, "Bird added successfully", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DetailsActivity, "Bird added successfully", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
         val intent = Intent(this@DetailsActivity, MainActivity2::class.java)
         startActivity(intent)
 
         finish()
+
     }
 
     fun update(v: View) {
         val name = nameEditText.text.toString()
         val notes = notesEditText.text.toString()
         val rarity = rarityTypes[raritySpinner.selectedItem]
+        val userId= auth.currentUser
 
 
         CoroutineScope(Dispatchers.IO).launch {

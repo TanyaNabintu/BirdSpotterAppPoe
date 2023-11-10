@@ -14,7 +14,7 @@ import com.example.birdspotterapppoe.Constants.TAG
 
 class CustomAdapter(
     private val context: Context,
-    private val birdList: List<Bird>,
+    private var birdList: List<Bird>,
     private val rarityTypes: Map<Int, String> = mapOf(
         Pair(0, "Common"),
         Pair(1, "Rare"),
@@ -36,6 +36,12 @@ class CustomAdapter(
     override fun getCount(): Int {
         return birdList.size
     }
+
+    fun updateList(list: List<Bird>) {
+        this.birdList = list
+        notifyDataSetChanged()
+    }
+
 
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {

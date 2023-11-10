@@ -3,6 +3,8 @@ package com.example.birdspotterapppoe
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.content.Intent
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
@@ -20,6 +22,7 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var unitSwitch: SwitchCompat
     private lateinit var listView: ListView
     private var customAdapter: CustomAdapter? = null
+    private lateinit var autoCompleteTextView: AutoCompleteTextView
 //    private var lastSelectedSortOption: String = "date"
     private var rarityTypes = mapOf(Pair(0, "Common"), Pair(1, "Rare"), Pair(2, "Extremely rare"))
 
@@ -35,6 +38,7 @@ class MainActivity2 : AppCompatActivity() {
         textView = findViewById(R.id.textView)
         spinner = findViewById(R.id.sortSpinner)
         listView = findViewById(R.id.listView)
+        autoCompleteTextView = findViewById(R.id.searchbar)
 
         val sortNames = resources.getStringArray(R.array.sort_types).toMutableList()
         sortNames.add("HOTSPOTS") // Add the new option
@@ -82,7 +86,27 @@ class MainActivity2 : AppCompatActivity() {
                 }
             }
         }
+
+        autoCompleteTextView.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {}
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+                val filteredList = birdList.filter {
+                    it.name?.contains(s.toString(), ignoreCase = true) == true ||
+                            it.rarity?.contains(s.toString(), ignoreCase = true) == true ||
+                            it.notes?.contains(s.toString(), ignoreCase = true) == true ||
+                            it.address?.contains(s.toString(), ignoreCase = true) == true
+                }
+                customAdapter?.updateList(filteredList)
+            }
+        }
+        )
+
     }
+
+
 
         fun loadIntoList(orderBy: String) {
             firestoreClass.getBirdList(orderBy) { birdList ->
@@ -104,13 +128,12 @@ class MainActivity2 : AppCompatActivity() {
                         intent.putExtra("image", birdList[+i].image)
                         intent.putExtra("latLng", birdList[+i].latLng)
                         intent.putExtra("address", birdList[+i].address)
+                        intent.putExtra("userId", birdList[+i].userId)
                         startActivity(intent)
                     }
                 }
             }
         }
-
-
 
         fun fabClicked(v: View) {
         val intent = Intent(this, DetailsActivity::class.java)

@@ -11,6 +11,7 @@ data class Bird(
     var image: String? = "",
     var latLng: String?  = "",
     var address: String? = "Default Address", // default value
+    var userId:String= "",
     @ServerTimestamp
     var date: Date? = Date()
 )

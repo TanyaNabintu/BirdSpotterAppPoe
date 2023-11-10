@@ -21,15 +21,6 @@ class FirestoreClass {
     private lateinit var auth: FirebaseAuth
 
 
-    fun getCurrentUserId(): String {
-        val currentUser = auth.currentUser
-        var currentUserId = ""
-        if (currentUser != null) {
-            currentUserId = currentUser.uid
-        }
-        return currentUserId
-    }
-
     suspend fun savePictureInStorage(birdPicture: Uri): String {
         return try {
             val imageName = UUID.randomUUID().toString()
@@ -72,7 +63,7 @@ class FirestoreClass {
             }
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents: ", exception)
-            }
+        }
     }
 
 
