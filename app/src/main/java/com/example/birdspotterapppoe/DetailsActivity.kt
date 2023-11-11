@@ -122,6 +122,7 @@ class DetailsActivity : AppCompatActivity() {
             imageLoader.enqueue(request)
 
             findViewById<Button>(R.id.btnAdd).visibility = View.GONE
+
             val currentUser = auth.currentUser?.uid
             if (currentUser == userId) {
                 findViewById<Button>(R.id.btnUpdate).visibility = View.VISIBLE
@@ -256,11 +257,11 @@ class DetailsActivity : AppCompatActivity() {
                 Toast.makeText(this@DetailsActivity, "Bird added successfully", Toast.LENGTH_SHORT)
                     .show()
             }
-        }
-        val intent = Intent(this@DetailsActivity, MainActivity2::class.java)
-        startActivity(intent)
 
-        finish()
+            val intent = Intent(this@DetailsActivity, MainActivity2::class.java)
+            startActivity(intent)
+            finish()
+        }
 
     }
 
@@ -268,8 +269,6 @@ class DetailsActivity : AppCompatActivity() {
         val name = nameEditText.text.toString()
         val notes = notesEditText.text.toString()
         val rarity = rarityTypes[raritySpinner.selectedItem]
-        val userId= auth.currentUser
-
 
         CoroutineScope(Dispatchers.IO).launch {
             var imageUri = imageUrl
@@ -300,7 +299,10 @@ class DetailsActivity : AppCompatActivity() {
 
     fun delete(v: View) {
         firestoreClass.deleteBird(modifyId)
+        Log.e(TAG, "The bird added is $")
         Toast.makeText(this, "Data deleted", Toast.LENGTH_SHORT).show()
+        val intent = Intent(this@DetailsActivity, MainActivity2::class.java)
+        startActivity(intent)
         finish()
     }
 }

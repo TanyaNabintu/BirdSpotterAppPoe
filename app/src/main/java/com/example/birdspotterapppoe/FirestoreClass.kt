@@ -54,6 +54,7 @@ class FirestoreClass {
                 var birdList = mutableListOf<Bird>()
                 for (document in documents) {
                     val bird = document.toObject(Bird::class.java)
+                    Log.d(TAG, "Rarity: ${bird.rarity}")
                     if(bird != null){
                         bird.id = document.id
                         birdList.add(bird)

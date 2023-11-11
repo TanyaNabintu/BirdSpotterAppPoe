@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "362381387735",
-    "project_id": "birdspotterapppoe-e8b95",
-    "storage_bucket": "birdspotterapppoe-e8b95.appspot.com"
+    "project_number": "5863849777",
+    "project_id": "birdspotterapp",
+    "storage_bucket": "birdspotterapp.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:362381387735:android:6c974d8d5ff6d987f7cd92",
+        "mobilesdk_app_id": "1:5863849777:android:359177ab70ca7212cffa10",
         "android_client_info": {
           "package_name": "com.example.birdspotterapppoe"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAHFh2xsBF9kcBySmxmsOsaahYwwPYbi_4"
+          "current_key": "AIzaSyAelPgTl-ZzLMFGRX6FC5gP8v3AH6B2XyA"
         }
       ],
       "services": {

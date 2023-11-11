@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
+import com.example.birdspotterapppoe.Constants.TAG
 import kotlin.collections.ArrayList
 
 
@@ -25,7 +27,8 @@ class MainActivity2 : AppCompatActivity() {
     private lateinit var autoCompleteTextView: AutoCompleteTextView
 //    private var lastSelectedSortOption: String = "date"
     private var rarityTypes = mapOf(Pair(0, "Common"), Pair(1, "Rare"), Pair(2, "Extremely rare"))
-
+    private var filteredList:List<Bird>  = emptyList()
+    private var originalBirdList: List<Bird> = emptyList()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,7 +77,6 @@ class MainActivity2 : AppCompatActivity() {
                     when (selectedItem) {
                         "SORT BY NAME" -> loadIntoList("name")
                         "SORT BY RARITY" -> loadIntoList("rarity")
-                        "SORT BY NOTES" -> loadIntoList("notes")
                         "SORT BY DATE" -> loadIntoList("date")
                     }
 
@@ -93,10 +95,9 @@ class MainActivity2 : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                val filteredList = birdList.filter {
+                 filteredList = birdList.filter {
                     it.name?.contains(s.toString(), ignoreCase = true) == true ||
                             it.rarity?.contains(s.toString(), ignoreCase = true) == true ||
-                            it.notes?.contains(s.toString(), ignoreCase = true) == true ||
                             it.address?.contains(s.toString(), ignoreCase = true) == true
                 }
                 customAdapter?.updateList(filteredList)
@@ -121,14 +122,19 @@ class MainActivity2 : AppCompatActivity() {
                     textView.visibility = View.GONE
 
                     findViewById<ListView>(R.id.listView).setOnItemClickListener { _, _, i, _ ->
+                        val selectedBird = if (filteredList.isNotEmpty()) {
+                                filteredList[+i]
+                          } else {
+                                originalBirdList[+i]
+                            }
                         val intent = Intent(this, DetailsActivity::class.java)
-                        intent.putExtra("id", birdList[+i].id)
-                        intent.putExtra("name", birdList[+i].name)
-                        intent.putExtra("notes", birdList[+i].notes)
-                        intent.putExtra("image", birdList[+i].image)
-                        intent.putExtra("latLng", birdList[+i].latLng)
-                        intent.putExtra("address", birdList[+i].address)
-                        intent.putExtra("userId", birdList[+i].userId)
+                        intent.putExtra("id", selectedBird.id)
+                        intent.putExtra("name", selectedBird.name)
+                        intent.putExtra("notes", selectedBird.notes)
+                        intent.putExtra("image", selectedBird.image)
+                        intent.putExtra("latLng", selectedBird.latLng)
+                        intent.putExtra("address", selectedBird.address)
+                        intent.putExtra("userId", selectedBird.userId)
                         startActivity(intent)
                     }
                 }
