@@ -39,8 +39,8 @@ enter these fields:
 it will be added to the firebase firestore
 
 Step 6:
-If you need to update or delete a bird you have to be the owner(I mean the one who has downloaded it)
-Just click the bird and you will see two buttons on bottom the one for update or delete . you can 
+If you need to update or delete a bird you have to be the owner(I mean the one who has added it)
+Just click on the bird and you will see two buttons on bottom the one for update or delete . you can 
 by editing fields or delete it.
 
 Step 7:
