@@ -4,7 +4,7 @@ Step 1:
 Download the code on this link : https://github.com/TanyaNabintu/BirdSpotterAppPoe.git
 And open the folder in android studio
  Or
-You can open your android studio IDE and click File -> New -> Project from Version Control -> paster 
+You can open your android studio IDE and click File -> New -> Project from Version Control -> paste 
 this link : https://github.com/TanyaNabintu/BirdSpotterAppPoe.git
 
 Step 2 :
@@ -12,12 +12,12 @@ If downloading is done , android itself will download dependencies.
 On top bar there is a menu called Run click on it and you see Run 'app' click on it
 
 Step 3:
- If successfully run it will install the app to emulator where you will arrive to login screen
- If is the first time you will need to click on register where there is three field to fill up
+ If successfully run it will install the app to the  emulator where you will arrive to login screen
+ If is the first time you will need to click on register where there is three fields to fill up
   -email
   -password
   -confirm password
- And you get redirected back to login page and fill up the 2 fields
+ And you get redirected back to login page and fill up these 2 fields
    -email 
   -password
 Step 4:
@@ -28,7 +28,7 @@ location on google maps.
 You can click on picture to see the details 
 
 Step 5:
-on bottom right there a plus (+) button and you will see a screen to add a new bird, you can try to
+on bottom right there is a plus (+) button and you will see a screen to add a new bird, you can try to
 enter these fields:
  -Enter the name of birds a
  -Click the dropdown button select if the bird is (common,rare,extremely rare)
