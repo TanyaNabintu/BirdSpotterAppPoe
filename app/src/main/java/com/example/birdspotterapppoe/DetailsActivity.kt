@@ -111,7 +111,6 @@ class DetailsActivity : AppCompatActivity() {
              * getting image
              */
             imageUrl = intent.getStringExtra("image") ?: ""
-            Log.e(TAG,"image url  in update if (intent.hasExtra(\"id\")) {  imageUrl $imageUrl")
             val imageView = uploadImageView
             val context = imageView.context
             val imageLoader = Coil.imageLoader(context)
@@ -124,6 +123,7 @@ class DetailsActivity : AppCompatActivity() {
             findViewById<Button>(R.id.btnAdd).visibility = View.GONE
 
             val currentUser = auth.currentUser?.uid
+            Log.e(TAG,"details activity in mainactvity $imageUrl $address $nameEditText  $notesEditText ")
             if (currentUser == userId) {
                 findViewById<Button>(R.id.btnUpdate).visibility = View.VISIBLE
                 findViewById<Button>(R.id.btnDelete).visibility = View.VISIBLE
